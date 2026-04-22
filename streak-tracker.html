@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sanskriti's Streak Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface2: #1a1a26;
+    --border: rgba(255,255,255,0.07);
+    --green: #00e87a;
+    --green-dim: rgba(0,232,122,0.12);
+    --green-mid: rgba(0,232,122,0.35);
+    --text: #f0f0f5;
+    --muted: #6b6b80;
+    --amber: #ffb830;
+    --blue: #4f9eff;
+    --purple: #9f7eff;
+    --red: #ff5c5c;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    padding: 2rem 1rem;
+  }
+  .mono { font-family: 'Space Mono', monospace; }
+
+  header {
+    max-width: 860px;
+    margin: 0 auto 2.5rem;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 1.5rem;
+  }
+  .logo { font-family: 'Space Mono', monospace; font-size: 13px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; }
+  .logo span { color: var(--green); }
+  .date-display { font-size: 12px; color: var(--muted); font-family: 'Space Mono', monospace; }
+
+  .main { max-width: 860px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.5rem; }
+
+  .streak-hero {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+  }
+  .streak-number {
+    font-family: 'Space Mono', monospace;
+    font-size: 80px;
+    font-weight: 700;
+    color: var(--green);
+    line-height: 1;
+    letter-spacing: -2px;
+  }
+  .streak-label { font-size: 13px; color: var(--muted); margin-top: 6px; letter-spacing: 0.05em; text-transform: uppercase; }
+  .streak-right { text-align: right; }
+  .best-streak { font-family: 'Space Mono', monospace; font-size: 28px; color: var(--amber); }
+  .best-label { font-size: 12px; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem;
+  }
+  .stat-value { font-family: 'Space Mono', monospace; font-size: 28px; font-weight: 700; }
+  .stat-label { font-size: 12px; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .v-green { color: var(--green); }
+  .v-blue { color: var(--blue); }
+  .v-purple { color: var(--purple); }
+  .v-amber { color: var(--amber); }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+  }
+  .card-title {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 1.25rem;
+    font-family: 'Space Mono', monospace;
+  }
+
+  .checkin-btn {
+    width: 100%;
+    padding: 1rem;
+    background: var(--green-dim);
+    border: 1px solid var(--green-mid);
+    border-radius: 12px;
+    color: var(--green);
+    font-family: 'Space Mono', monospace;
+    font-size: 14px;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    transition: all 0.15s;
+  }
+  .checkin-btn:hover { background: rgba(0,232,122,0.2); }
+  .checkin-btn:active { transform: scale(0.98); }
+  .checkin-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+  .checkin-btn.done { background: var(--green-dim); border-color: var(--green); color: var(--green); }
+
+  .tasks-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 1.25rem; }
+  .task-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    background: var(--surface2);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.1s;
+  }
+  .task-item:hover { background: rgba(255,255,255,0.05); }
+  .task-check {
+    width: 18px; height: 18px;
+    border-radius: 4px;
+    border: 1.5px solid var(--muted);
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+  }
+  .task-check.done { background: var(--green); border-color: var(--green); }
+  .task-check.done::after {
+    content: '';
+    width: 4px; height: 7px;
+    border: 2px solid var(--bg);
+    border-top: none; border-left: none;
+    transform: rotate(45deg) translateY(-1px);
+    display: block;
+  }
+  .task-text { font-size: 14px; flex: 1; }
+  .task-text.done { text-decoration: line-through; color: var(--muted); }
+  .task-tag {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 99px;
+    font-family: 'Space Mono', monospace;
+    letter-spacing: 0.05em;
+  }
+  .tag-dsa { background: rgba(79,158,255,0.15); color: var(--blue); }
+  .tag-proj { background: rgba(0,232,122,0.12); color: var(--green); }
+  .tag-apply { background: rgba(255,184,48,0.15); color: var(--amber); }
+  .tag-apt { background: rgba(159,126,255,0.15); color: var(--purple); }
+  .tag-learn { background: rgba(255,92,92,0.12); color: var(--red); }
+
+  .heatmap-wrap { overflow-x: auto; }
+  .heatmap-months { display: flex; gap: 2px; margin-bottom: 4px; }
+  .month-label { font-size: 10px; color: var(--muted); font-family: 'Space Mono', monospace; min-width: 14px; text-align: center; }
+  .heatmap-grid {
+    display: grid;
+    grid-template-rows: repeat(7, 14px);
+    grid-auto-flow: column;
+    gap: 2px;
+  }
+  .hm-cell {
+    width: 14px; height: 14px;
+    border-radius: 3px;
+    background: var(--surface2);
+    cursor: pointer;
+    transition: transform 0.1s;
+    position: relative;
+  }
+  .hm-cell:hover { transform: scale(1.3); z-index: 1; }
+  .hm-cell.l1 { background: rgba(0,232,122,0.25); }
+  .hm-cell.l2 { background: rgba(0,232,122,0.5); }
+  .hm-cell.l3 { background: rgba(0,232,122,0.75); }
+  .hm-cell.l4 { background: var(--green); }
+  .hm-cell.today { outline: 1.5px solid var(--blue); outline-offset: 1px; }
+  .day-labels { display: grid; grid-template-rows: repeat(7, 14px); gap: 2px; margin-right: 6px; }
+  .day-lbl { font-size: 9px; color: var(--muted); font-family: 'Space Mono', monospace; line-height: 14px; }
+  .heatmap-row { display: flex; align-items: flex-start; }
+
+  .weekly-targets { display: flex; flex-direction: column; gap: 12px; }
+  .wt-row { display: flex; align-items: center; gap: 12px; }
+  .wt-label { font-size: 13px; color: var(--text); min-width: 140px; }
+  .wt-bar-bg { flex: 1; background: var(--surface2); border-radius: 99px; height: 6px; overflow: hidden; }
+  .wt-bar-fill { height: 100%; border-radius: 99px; background: var(--green); transition: width 0.4s; }
+  .wt-count { font-size: 12px; color: var(--muted); font-family: 'Space Mono', monospace; min-width: 40px; text-align: right; }
+
+  .hours-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .hours-label { font-size: 13px; color: var(--muted); min-width: 130px; }
+  .hours-val { font-size: 13px; font-family: 'Space Mono', monospace; color: var(--green); min-width: 32px; text-align: right; }
+  input[type=range] {
+    flex: 1;
+    -webkit-appearance: none;
+    height: 4px;
+    background: var(--surface2);
+    border-radius: 99px;
+    outline: none;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: var(--green);
+    cursor: pointer;
+  }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+
+  .toast {
+    position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(100px);
+    background: var(--green); color: var(--bg);
+    padding: 12px 24px; border-radius: 99px;
+    font-family: 'Space Mono', monospace; font-size: 13px;
+    transition: transform 0.3s; z-index: 100;
+    pointer-events: none;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  .legend { display: flex; align-items: center; gap: 16px; margin-top: 12px; }
+  .leg-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted); }
+  .leg-box { width: 12px; height: 12px; border-radius: 2px; }
+
+  @media (max-width: 600px) {
+    .two-col { grid-template-columns: 1fr; }
+    .streak-number { font-size: 56px; }
+    header { flex-direction: column; align-items: flex-start; gap: 8px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Sanskriti's <span>streak</span> tracker</div>
+  <div class="date-display" id="dateDisplay"></div>
+</header>
+
+<div class="main">
+
+  <div class="streak-hero">
+    <div>
+      <div class="streak-number mono" id="streakNum">0</div>
+      <div class="streak-label">day streak</div>
+    </div>
+    <div class="streak-right">
+      <div class="best-streak mono" id="bestStreak">0</div>
+      <div class="best-label">best streak</div>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-value v-green mono" id="totalDays">0</div><div class="stat-label">Total days logged</div></div>
+    <div class="stat-card"><div class="stat-value v-blue mono" id="thisWeek">0</div><div class="stat-label">This week</div></div>
+    <div class="stat-card"><div class="stat-value v-amber mono" id="totalHours">0h</div><div class="stat-label">Total hours</div></div>
+    <div class="stat-card"><div class="stat-value v-purple mono" id="tasksCompleted">0</div><div class="stat-label">Tasks done total</div></div>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">Today's tasks</div>
+      <div class="tasks-list" id="taskList"></div>
+      <button class="checkin-btn" id="checkinBtn" onclick="checkIn()">Check in for today</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Log focus hours</div>
+      <div class="hours-row"><span class="hours-label">DSA / Leetcode</span><input type="range" min="0" max="4" step="0.5" value="0" id="h-dsa" oninput="updateHours('dsa',this.value)"><span class="hours-val" id="v-dsa">0h</span></div>
+      <div class="hours-row"><span class="hours-label">Project work</span><input type="range" min="0" max="4" step="0.5" value="0" id="h-proj" oninput="updateHours('proj',this.value)"><span class="hours-val" id="v-proj">0h</span></div>
+      <div class="hours-row"><span class="hours-label">Applications</span><input type="range" min="0" max="2" step="0.5" value="0" id="h-apply" oninput="updateHours('apply',this.value)"><span class="hours-val" id="v-apply">0h</span></div>
+      <div class="hours-row"><span class="hours-label">Aptitude prep</span><input type="range" min="0" max="2" step="0.5" value="0" id="h-apt" oninput="updateHours('apt',this.value)"><span class="hours-val" id="v-apt">0h</span></div>
+      <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:13px;color:var(--muted);">Today's total</span>
+        <span style="font-family:'Space Mono',monospace;font-size:20px;color:var(--green);" id="todayTotal">0h</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Activity — last 16 weeks</div>
+    <div class="heatmap-row">
+      <div class="day-labels">
+        <div class="day-lbl">Mon</div>
+        <div class="day-lbl">Tue</div>
+        <div class="day-lbl">Wed</div>
+        <div class="day-lbl">Thu</div>
+        <div class="day-lbl">Fri</div>
+        <div class="day-lbl">Sat</div>
+        <div class="day-lbl">Sun</div>
+      </div>
+      <div class="heatmap-wrap">
+        <div class="heatmap-grid" id="heatmap"></div>
+      </div>
+    </div>
+    <div class="legend">
+      <div class="leg-item"><div class="leg-box" style="background:var(--surface2)"></div>No activity</div>
+      <div class="leg-item"><div class="leg-box" style="background:rgba(0,232,122,0.25)"></div>1-2h</div>
+      <div class="leg-item"><div class="leg-box" style="background:rgba(0,232,122,0.5)"></div>2-3h</div>
+      <div class="leg-item"><div class="leg-box" style="background:rgba(0,232,122,0.75)"></div>3-4h</div>
+      <div class="leg-item"><div class="leg-box" style="background:var(--green)"></div>4h+</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Weekly targets</div>
+    <div class="weekly-targets" id="weeklyTargets"></div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const STORAGE_KEY = 'sanskriti_streak_v1';
+const TASKS = [
+  { id: 'dsa', text: 'Solve 1 Leetcode problem', tag: 'DSA', cls: 'tag-dsa' },
+  { id: 'commit', text: 'Make 1 GitHub commit', tag: 'Project', cls: 'tag-proj' },
+  { id: 'apply', text: 'Apply to 1 internship', tag: 'Apply', cls: 'tag-apply' },
+  { id: 'apt', text: 'Solve 10 aptitude questions', tag: 'Aptitude', cls: 'tag-apt' },
+  { id: 'learn', text: 'Watch 1 tech video', tag: 'Learn', cls: 'tag-learn' },
+];
+const WEEKLY = [
+  { label: 'Leetcode problems', key: 'leet', target: 5 },
+  { label: 'GitHub commits', key: 'commits', target: 3 },
+  { label: 'Applications sent', key: 'apps', target: 5 },
+  { label: 'Aptitude questions', key: 'apt', target: 50 },
+  { label: 'Focus hours', key: 'hours', target: 30 },
+];
+
+function todayKey() {
+  return new Date().toISOString().split('T')[0];
+}
+
+function loadData() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || defaultData();
+  } catch(e) { return defaultData(); }
+}
+
+function defaultData() {
+  return {
+    days: {},
+    bestStreak: 0,
+    totalTasksDone: 0,
+    weeklyProgress: { leet: 0, commits: 0, apps: 0, apt: 0, hours: 0 },
+    weekStart: getWeekStart(),
+  };
+}
+
+function saveData(d) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(d));
+}
+
+function getWeekStart() {
+  const d = new Date();
+  const day = d.getDay();
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+  const mon = new Date(d.setDate(diff));
+  return mon.toISOString().split('T')[0];
+}
+
+let data = loadData();
+let todayHours = { dsa: 0, proj: 0, apply: 0, apt: 0 };
+
+function getTodayData() {
+  const k = todayKey();
+  if (!data.days[k]) data.days[k] = { tasks: {}, hours: 0, checkedIn: false };
+  return data.days[k];
+}
+
+function calcStreak() {
+  let streak = 0;
+  const d = new Date();
+  for (let i = 0; i < 365; i++) {
+    const key = d.toISOString().split('T')[0];
+    if (data.days[key] && data.days[key].checkedIn) {
+      streak++;
+      d.setDate(d.getDate() - 1);
+    } else if (i === 0) {
+      d.setDate(d.getDate() - 1);
+    } else {
+      break;
+    }
+  }
+  return streak;
+}
+
+function calcThisWeek() {
+  const ws = getWeekStart();
+  let count = 0;
+  for (const k in data.days) {
+    if (k >= ws && data.days[k].checkedIn) count++;
+  }
+  return count;
+}
+
+function calcTotalHours() {
+  let total = 0;
+  for (const k in data.days) total += (data.days[k].hours || 0);
+  return Math.round(total * 10) / 10;
+}
+
+function updateHours(key, val) {
+  todayHours[key] = parseFloat(val);
+  document.getElementById('v-' + key).textContent = parseFloat(val) + 'h';
+  const total = Object.values(todayHours).reduce((a, b) => a + b, 0);
+  document.getElementById('todayTotal').textContent = (Math.round(total * 10) / 10) + 'h';
+}
+
+function toggleTask(id) {
+  const td = getTodayData();
+  td.tasks[id] = !td.tasks[id];
+  saveData(data);
+  renderTasks();
+  updateStats();
+}
+
+function checkIn() {
+  const td = getTodayData();
+  if (td.checkedIn) return;
+  const total = Object.values(todayHours).reduce((a, b) => a + b, 0);
+  td.hours = Math.round(total * 10) / 10;
+  td.checkedIn = true;
+
+  if (todayHours.dsa > 0) data.weeklyProgress.leet = Math.min(5, data.weeklyProgress.leet + 1);
+  if (todayHours.proj > 0) data.weeklyProgress.commits = Math.min(3, data.weeklyProgress.commits + 1);
+  if (todayHours.apply > 0) data.weeklyProgress.apps = Math.min(5, data.weeklyProgress.apps + 1);
+  if (todayHours.apt > 0) data.weeklyProgress.apt = Math.min(50, data.weeklyProgress.apt + 10);
+  data.weeklyProgress.hours = Math.min(30, Math.round((data.weeklyProgress.hours + total) * 10) / 10);
+
+  const streak = calcStreak();
+  if (streak > data.bestStreak) data.bestStreak = streak;
+
+  const doneTasks = Object.values(td.tasks).filter(Boolean).length;
+  data.totalTasksDone = (data.totalTasksDone || 0) + doneTasks;
+
+  saveData(data);
+  renderAll();
+  showToast('Checked in! Keep the streak going!');
+  document.getElementById('checkinBtn').disabled = true;
+  document.getElementById('checkinBtn').textContent = 'Checked in today';
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function renderTasks() {
+  const td = getTodayData();
+  document.getElementById('taskList').innerHTML = TASKS.map(t => `
+    <div class="task-item" onclick="toggleTask('${t.id}')">
+      <div class="task-check ${td.tasks[t.id] ? 'done' : ''}"></div>
+      <span class="task-text ${td.tasks[t.id] ? 'done' : ''}">${t.text}</span>
+      <span class="task-tag ${t.cls}">${t.tag}</span>
+    </div>
+  `).join('');
+}
+
+function renderHeatmap() {
+  const grid = document.getElementById('heatmap');
+  const today = new Date();
+  const cells = [];
+  for (let i = 111; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(today.getDate() - i);
+    const key = d.toISOString().split('T')[0];
+    const day = data.days[key];
+    const h = day ? (day.hours || 0) : 0;
+    const isToday = i === 0;
+    let lvl = '';
+    if (h >= 4) lvl = 'l4';
+    else if (h >= 3) lvl = 'l3';
+    else if (h >= 2) lvl = 'l2';
+    else if (h > 0 || (day && day.checkedIn)) lvl = 'l1';
+    cells.push(`<div class="hm-cell ${lvl} ${isToday ? 'today' : ''}" title="${key}: ${h}h"></div>`);
+  }
+  grid.innerHTML = cells.join('');
+}
+
+function renderWeekly() {
+  document.getElementById('weeklyTargets').innerHTML = WEEKLY.map(w => {
+    const val = data.weeklyProgress[w.key] || 0;
+    const pct = Math.min(100, Math.round((val / w.target) * 100));
+    return `<div class="wt-row">
+      <span class="wt-label">${w.label}</span>
+      <div class="wt-bar-bg"><div class="wt-bar-fill" style="width:${pct}%"></div></div>
+      <span class="wt-count">${val}/${w.target}</span>
+    </div>`;
+  }).join('');
+}
+
+function updateStats() {
+  const streak = calcStreak();
+  document.getElementById('streakNum').textContent = streak;
+  document.getElementById('bestStreak').textContent = Math.max(streak, data.bestStreak);
+  document.getElementById('totalDays').textContent = Object.values(data.days).filter(d => d.checkedIn).length;
+  document.getElementById('thisWeek').textContent = calcThisWeek();
+  document.getElementById('totalHours').textContent = calcTotalHours() + 'h';
+  document.getElementById('tasksCompleted').textContent = data.totalTasksDone || 0;
+}
+
+function renderAll() {
+  renderTasks();
+  renderHeatmap();
+  renderWeekly();
+  updateStats();
+  const td = getTodayData();
+  const btn = document.getElementById('checkinBtn');
+  if (td.checkedIn) { btn.disabled = true; btn.textContent = 'Checked in today'; }
+}
+
+document.getElementById('dateDisplay').textContent = new Date().toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+const ws = getWeekStart();
+if (data.weekStart !== ws) {
+  data.weeklyProgress = { leet: 0, commits: 0, apps: 0, apt: 0, hours: 0 };
+  data.weekStart = ws;
+  saveData(data);
+}
+
+renderAll();
+</script>
+</body>
+</html>
