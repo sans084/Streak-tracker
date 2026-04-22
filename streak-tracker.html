@@ -6,532 +6,289 @@
 <title>Sanskriti's Streak Tracker</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #0a0a0f;
-    --surface: #12121a;
-    --surface2: #1a1a26;
-    --border: rgba(255,255,255,0.07);
-    --green: #00e87a;
-    --green-dim: rgba(0,232,122,0.12);
-    --green-mid: rgba(0,232,122,0.35);
-    --text: #f0f0f5;
-    --muted: #6b6b80;
-    --amber: #ffb830;
-    --blue: #4f9eff;
-    --purple: #9f7eff;
-    --red: #ff5c5c;
-  }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    min-height: 100vh;
-    padding: 2rem 1rem;
-  }
-  .mono { font-family: 'Space Mono', monospace; }
-
-  header {
-    max-width: 860px;
-    margin: 0 auto 2.5rem;
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 1.5rem;
-  }
-  .logo { font-family: 'Space Mono', monospace; font-size: 13px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; }
-  .logo span { color: var(--green); }
-  .date-display { font-size: 12px; color: var(--muted); font-family: 'Space Mono', monospace; }
-
-  .main { max-width: 860px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.5rem; }
-
-  .streak-hero {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 2rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 2rem;
-  }
-  .streak-number {
-    font-family: 'Space Mono', monospace;
-    font-size: 80px;
-    font-weight: 700;
-    color: var(--green);
-    line-height: 1;
-    letter-spacing: -2px;
-  }
-  .streak-label { font-size: 13px; color: var(--muted); margin-top: 6px; letter-spacing: 0.05em; text-transform: uppercase; }
-  .streak-right { text-align: right; }
-  .best-streak { font-family: 'Space Mono', monospace; font-size: 28px; color: var(--amber); }
-  .best-label { font-size: 12px; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
-
-  .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 1rem;
-  }
-  .stat-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 1.25rem;
-  }
-  .stat-value { font-family: 'Space Mono', monospace; font-size: 28px; font-weight: 700; }
-  .stat-label { font-size: 12px; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
-  .v-green { color: var(--green); }
-  .v-blue { color: var(--blue); }
-  .v-purple { color: var(--purple); }
-  .v-amber { color: var(--amber); }
-
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 1.5rem;
-  }
-  .card-title {
-    font-size: 11px;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    margin-bottom: 1.25rem;
-    font-family: 'Space Mono', monospace;
-  }
-
-  .checkin-btn {
-    width: 100%;
-    padding: 1rem;
-    background: var(--green-dim);
-    border: 1px solid var(--green-mid);
-    border-radius: 12px;
-    color: var(--green);
-    font-family: 'Space Mono', monospace;
-    font-size: 14px;
-    cursor: pointer;
-    letter-spacing: 0.05em;
-    transition: all 0.15s;
-  }
-  .checkin-btn:hover { background: rgba(0,232,122,0.2); }
-  .checkin-btn:active { transform: scale(0.98); }
-  .checkin-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
-  .checkin-btn.done { background: var(--green-dim); border-color: var(--green); color: var(--green); }
-
-  .tasks-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 1.25rem; }
-  .task-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 12px;
-    background: var(--surface2);
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background 0.1s;
-  }
-  .task-item:hover { background: rgba(255,255,255,0.05); }
-  .task-check {
-    width: 18px; height: 18px;
-    border-radius: 4px;
-    border: 1.5px solid var(--muted);
-    flex-shrink: 0;
-    display: flex; align-items: center; justify-content: center;
-    transition: all 0.15s;
-  }
-  .task-check.done { background: var(--green); border-color: var(--green); }
-  .task-check.done::after {
-    content: '';
-    width: 4px; height: 7px;
-    border: 2px solid var(--bg);
-    border-top: none; border-left: none;
-    transform: rotate(45deg) translateY(-1px);
-    display: block;
-  }
-  .task-text { font-size: 14px; flex: 1; }
-  .task-text.done { text-decoration: line-through; color: var(--muted); }
-  .task-tag {
-    font-size: 10px;
-    padding: 2px 8px;
-    border-radius: 99px;
-    font-family: 'Space Mono', monospace;
-    letter-spacing: 0.05em;
-  }
-  .tag-dsa { background: rgba(79,158,255,0.15); color: var(--blue); }
-  .tag-proj { background: rgba(0,232,122,0.12); color: var(--green); }
-  .tag-apply { background: rgba(255,184,48,0.15); color: var(--amber); }
-  .tag-apt { background: rgba(159,126,255,0.15); color: var(--purple); }
-  .tag-learn { background: rgba(255,92,92,0.12); color: var(--red); }
-
-  .heatmap-wrap { overflow-x: auto; }
-  .heatmap-months { display: flex; gap: 2px; margin-bottom: 4px; }
-  .month-label { font-size: 10px; color: var(--muted); font-family: 'Space Mono', monospace; min-width: 14px; text-align: center; }
-  .heatmap-grid {
-    display: grid;
-    grid-template-rows: repeat(7, 14px);
-    grid-auto-flow: column;
-    gap: 2px;
-  }
-  .hm-cell {
-    width: 14px; height: 14px;
-    border-radius: 3px;
-    background: var(--surface2);
-    cursor: pointer;
-    transition: transform 0.1s;
-    position: relative;
-  }
-  .hm-cell:hover { transform: scale(1.3); z-index: 1; }
-  .hm-cell.l1 { background: rgba(0,232,122,0.25); }
-  .hm-cell.l2 { background: rgba(0,232,122,0.5); }
-  .hm-cell.l3 { background: rgba(0,232,122,0.75); }
-  .hm-cell.l4 { background: var(--green); }
-  .hm-cell.today { outline: 1.5px solid var(--blue); outline-offset: 1px; }
-  .day-labels { display: grid; grid-template-rows: repeat(7, 14px); gap: 2px; margin-right: 6px; }
-  .day-lbl { font-size: 9px; color: var(--muted); font-family: 'Space Mono', monospace; line-height: 14px; }
-  .heatmap-row { display: flex; align-items: flex-start; }
-
-  .weekly-targets { display: flex; flex-direction: column; gap: 12px; }
-  .wt-row { display: flex; align-items: center; gap: 12px; }
-  .wt-label { font-size: 13px; color: var(--text); min-width: 140px; }
-  .wt-bar-bg { flex: 1; background: var(--surface2); border-radius: 99px; height: 6px; overflow: hidden; }
-  .wt-bar-fill { height: 100%; border-radius: 99px; background: var(--green); transition: width 0.4s; }
-  .wt-count { font-size: 12px; color: var(--muted); font-family: 'Space Mono', monospace; min-width: 40px; text-align: right; }
-
-  .hours-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
-  .hours-label { font-size: 13px; color: var(--muted); min-width: 130px; }
-  .hours-val { font-size: 13px; font-family: 'Space Mono', monospace; color: var(--green); min-width: 32px; text-align: right; }
-  input[type=range] {
-    flex: 1;
-    -webkit-appearance: none;
-    height: 4px;
-    background: var(--surface2);
-    border-radius: 99px;
-    outline: none;
-  }
-  input[type=range]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 14px; height: 14px;
-    border-radius: 50%;
-    background: var(--green);
-    cursor: pointer;
-  }
-
-  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-
-  .toast {
-    position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(100px);
-    background: var(--green); color: var(--bg);
-    padding: 12px 24px; border-radius: 99px;
-    font-family: 'Space Mono', monospace; font-size: 13px;
-    transition: transform 0.3s; z-index: 100;
-    pointer-events: none;
-  }
-  .toast.show { transform: translateX(-50%) translateY(0); }
-
-  .legend { display: flex; align-items: center; gap: 16px; margin-top: 12px; }
-  .leg-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted); }
-  .leg-box { width: 12px; height: 12px; border-radius: 2px; }
-
-  @media (max-width: 600px) {
-    .two-col { grid-template-columns: 1fr; }
-    .streak-number { font-size: 56px; }
-    header { flex-direction: column; align-items: flex-start; gap: 8px; }
-  }
+  :root{--bg:#0a0a0f;--surface:#12121a;--surface2:#1a1a26;--border:rgba(255,255,255,0.07);--green:#00e87a;--green-dim:rgba(0,232,122,0.12);--green-mid:rgba(0,232,122,0.35);--text:#f0f0f5;--muted:#6b6b80;--amber:#ffb830;--blue:#4f9eff;--purple:#9f7eff;--red:#ff5c5c;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;padding:2rem 1rem;}
+  header{max-width:900px;margin:0 auto 2rem;display:flex;align-items:flex-end;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:1.5rem;}
+  .logo{font-family:'Space Mono',monospace;font-size:13px;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;}
+  .logo span{color:var(--green);}
+  .date-display{font-size:12px;color:var(--muted);font-family:'Space Mono',monospace;}
+  .main{max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:1.5rem;}
+  .streak-hero{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:2rem;display:flex;align-items:center;justify-content:space-between;gap:2rem;}
+  .streak-number{font-family:'Space Mono',monospace;font-size:80px;font-weight:700;color:var(--green);line-height:1;letter-spacing:-2px;}
+  @keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.15)}100%{transform:scale(1)}}
+  .streak-number.pop{animation:pop 0.4s ease;}
+  .streak-label{font-size:13px;color:var(--muted);margin-top:6px;letter-spacing:0.05em;text-transform:uppercase;}
+  .streak-right{text-align:right;}
+  .best-streak{font-family:'Space Mono',monospace;font-size:28px;color:var(--amber);}
+  .best-label{font-size:12px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:0.05em;}
+  .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1rem;}
+  .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.25rem;}
+  .stat-value{font-family:'Space Mono',monospace;font-size:28px;font-weight:700;}
+  .stat-label{font-size:12px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:0.05em;}
+  .v-green{color:var(--green);}.v-blue{color:var(--blue);}.v-purple{color:var(--purple);}.v-amber{color:var(--amber);}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.5rem;}
+  .card-title{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:1.25rem;font-family:'Space Mono',monospace;}
+  .tab-bar{display:flex;gap:4px;background:var(--surface2);border-radius:10px;padding:4px;margin-bottom:1.5rem;}
+  .tab-btn{flex:1;padding:8px;border:none;background:transparent;color:var(--muted);font-family:'Space Mono',monospace;font-size:11px;cursor:pointer;border-radius:7px;transition:all 0.15s;letter-spacing:0.05em;}
+  .tab-btn.active{background:var(--surface);color:var(--green);}
+  .tab-panel{display:none;}
+  .tab-panel.active{display:block;}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;}
+  .checkin-btn{width:100%;padding:1rem;background:var(--green-dim);border:1px solid var(--green-mid);border-radius:12px;color:var(--green);font-family:'Space Mono',monospace;font-size:14px;cursor:pointer;letter-spacing:0.05em;transition:all 0.15s;margin-top:1rem;}
+  .checkin-btn:hover{background:rgba(0,232,122,0.2);}
+  .checkin-btn:active{transform:scale(0.98);}
+  .checkin-btn:disabled{opacity:0.4;cursor:not-allowed;transform:none;}
+  .tasks-list{display:flex;flex-direction:column;gap:8px;margin-bottom:1rem;}
+  .task-item{display:flex;align-items:center;gap:12px;padding:10px 12px;background:var(--surface2);border-radius:8px;cursor:pointer;transition:background 0.1s;}
+  .task-item:hover{background:rgba(255,255,255,0.05);}
+  .task-check{width:18px;height:18px;border-radius:4px;border:1.5px solid var(--muted);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.15s;}
+  .task-check.done{background:var(--green);border-color:var(--green);}
+  .task-check.done::after{content:'';width:4px;height:7px;border:2px solid var(--bg);border-top:none;border-left:none;transform:rotate(45deg) translateY(-1px);display:block;}
+  .task-text{font-size:14px;flex:1;}
+  .task-text.done{text-decoration:line-through;color:var(--muted);}
+  .task-tag{font-size:10px;padding:2px 8px;border-radius:99px;font-family:'Space Mono',monospace;letter-spacing:0.05em;}
+  .tag-dsa{background:rgba(79,158,255,0.15);color:var(--blue);}
+  .tag-proj{background:rgba(0,232,122,0.12);color:var(--green);}
+  .tag-apply{background:rgba(255,184,48,0.15);color:var(--amber);}
+  .tag-apt{background:rgba(159,126,255,0.15);color:var(--purple);}
+  .tag-learn{background:rgba(255,92,92,0.12);color:var(--red);}
+  .hours-row{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+  .hours-label{font-size:13px;color:var(--muted);min-width:110px;}
+  .hours-val{font-size:13px;font-family:'Space Mono',monospace;color:var(--green);min-width:32px;text-align:right;}
+  input[type=range]{flex:1;-webkit-appearance:none;height:4px;background:var(--surface2);border-radius:99px;outline:none;}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--green);cursor:pointer;}
+  .heatmap-row{display:flex;align-items:flex-start;}
+  .heatmap-wrap{overflow-x:auto;}
+  .heatmap-grid{display:grid;grid-template-rows:repeat(7,14px);grid-auto-flow:column;gap:2px;}
+  .hm-cell{width:14px;height:14px;border-radius:3px;background:var(--surface2);cursor:pointer;transition:transform 0.1s;}
+  .hm-cell:hover{transform:scale(1.3);z-index:1;}
+  .hm-cell.l1{background:rgba(0,232,122,0.25);}
+  .hm-cell.l2{background:rgba(0,232,122,0.5);}
+  .hm-cell.l3{background:rgba(0,232,122,0.75);}
+  .hm-cell.l4{background:var(--green);}
+  .hm-cell.today{outline:1.5px solid var(--blue);outline-offset:1px;}
+  .day-labels{display:grid;grid-template-rows:repeat(7,14px);gap:2px;margin-right:6px;}
+  .day-lbl{font-size:9px;color:var(--muted);font-family:'Space Mono',monospace;line-height:14px;}
+  .legend{display:flex;align-items:center;gap:16px;margin-top:12px;}
+  .leg-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);}
+  .leg-box{width:12px;height:12px;border-radius:2px;}
+  .weekly-targets{display:flex;flex-direction:column;gap:12px;}
+  .wt-row{display:flex;align-items:center;gap:12px;}
+  .wt-label{font-size:13px;color:var(--text);min-width:140px;}
+  .wt-bar-bg{flex:1;background:var(--surface2);border-radius:99px;height:6px;overflow:hidden;}
+  .wt-bar-fill{height:100%;border-radius:99px;background:var(--green);transition:width 0.4s;}
+  .wt-count{font-size:12px;color:var(--muted);font-family:'Space Mono',monospace;min-width:40px;text-align:right;}
+  .pomodoro-display{text-align:center;padding:1rem 0;}
+  .pom-time{font-family:'Space Mono',monospace;font-size:56px;font-weight:700;letter-spacing:-2px;}
+  .pom-time.work{color:var(--green);}
+  .pom-time.rest{color:var(--blue);}
+  .pom-label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-top:6px;font-family:'Space Mono',monospace;}
+  .pom-controls{display:flex;gap:8px;justify-content:center;margin-top:1.25rem;}
+  .pom-btn{padding:10px 24px;border-radius:99px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-family:'Space Mono',monospace;font-size:12px;cursor:pointer;transition:all 0.15s;letter-spacing:0.05em;}
+  .pom-btn:hover{background:rgba(255,255,255,0.05);}
+  .pom-btn.primary{background:var(--green-dim);border-color:var(--green-mid);color:var(--green);}
+  .pom-btn.primary:hover{background:rgba(0,232,122,0.2);}
+  .pom-sessions{display:flex;gap:6px;justify-content:center;margin-top:1rem;}
+  .pom-dot{width:10px;height:10px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);transition:background 0.2s;}
+  .pom-dot.done{background:var(--green);border-color:var(--green);}
+  .pom-progress{height:3px;background:var(--surface2);border-radius:99px;margin-top:1.25rem;overflow:hidden;}
+  .pom-progress-fill{height:100%;background:var(--green);border-radius:99px;transition:width 0.5s linear;}
+  .leet-add{display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap;}
+  .leet-add input{flex:1;min-width:160px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;}
+  .leet-add input:focus{border-color:var(--green-mid);}
+  .leet-add select{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:'Space Mono',monospace;font-size:11px;outline:none;cursor:pointer;}
+  .leet-add-btn{padding:8px 16px;background:var(--green-dim);border:1px solid var(--green-mid);border-radius:8px;color:var(--green);font-family:'Space Mono',monospace;font-size:12px;cursor:pointer;white-space:nowrap;}
+  .leet-add-btn:hover{background:rgba(0,232,122,0.2);}
+  .leet-stats{display:flex;gap:12px;margin-bottom:1rem;}
+  .leet-stat{background:var(--surface2);border-radius:8px;padding:8px 12px;text-align:center;flex:1;}
+  .leet-stat-num{font-family:'Space Mono',monospace;font-size:20px;font-weight:700;}
+  .leet-stat-lbl{font-size:10px;color:var(--muted);margin-top:2px;}
+  .leet-list{display:flex;flex-direction:column;gap:6px;max-height:280px;overflow-y:auto;}
+  .leet-item{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--surface2);border-radius:8px;}
+  .leet-num{font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);min-width:24px;}
+  .leet-name{flex:1;font-size:14px;}
+  .leet-date{font-size:11px;color:var(--muted);font-family:'Space Mono',monospace;}
+  .diff-easy{color:var(--green);font-size:10px;padding:2px 8px;background:var(--green-dim);border-radius:99px;font-family:'Space Mono',monospace;}
+  .diff-medium{color:var(--amber);font-size:10px;padding:2px 8px;background:rgba(255,184,48,0.12);border-radius:99px;font-family:'Space Mono',monospace;}
+  .diff-hard{color:var(--red);font-size:10px;padding:2px 8px;background:rgba(255,92,92,0.12);border-radius:99px;font-family:'Space Mono',monospace;}
+  .leet-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:2px 4px;}
+  .leet-del:hover{color:var(--red);}
+  .empty-state{text-align:center;padding:2rem;color:var(--muted);font-size:14px;}
+  .journal-date-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;}
+  .nav-btn{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 12px;color:var(--text);cursor:pointer;font-size:16px;}
+  .nav-btn:hover{background:rgba(255,255,255,0.05);}
+  .journal-date{font-family:'Space Mono',monospace;font-size:13px;color:var(--muted);}
+  .journal-textarea{width:100%;min-height:160px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;line-height:1.7;outline:none;resize:vertical;}
+  .journal-textarea:focus{border-color:var(--green-mid);}
+  .journal-save{padding:8px 20px;background:var(--green-dim);border:1px solid var(--green-mid);border-radius:8px;color:var(--green);font-family:'Space Mono',monospace;font-size:12px;cursor:pointer;margin-top:8px;}
+  .journal-save:hover{background:rgba(0,232,122,0.2);}
+  .journal-saved{display:inline-block;margin-left:8px;font-size:12px;color:var(--green);opacity:0;transition:opacity 0.3s;font-family:'Space Mono',monospace;}
+  .journal-history{margin-top:1.25rem;display:flex;flex-direction:column;gap:6px;}
+  .journal-entry-preview{padding:10px 12px;background:var(--surface2);border-radius:8px;cursor:pointer;}
+  .journal-entry-preview:hover{background:rgba(255,255,255,0.04);}
+  .je-date{font-size:11px;color:var(--muted);font-family:'Space Mono',monospace;margin-bottom:4px;}
+  .je-text{font-size:13px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(100px);background:var(--green);color:var(--bg);padding:12px 24px;border-radius:99px;font-family:'Space Mono',monospace;font-size:13px;transition:transform 0.3s;z-index:100;pointer-events:none;}
+  .toast.show{transform:translateX(-50%) translateY(0);}
+  canvas#confetti{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999;}
+  @media(max-width:600px){.two-col{grid-template-columns:1fr;}.streak-number{font-size:56px;}header{flex-direction:column;align-items:flex-start;gap:8px;}}
 </style>
 </head>
 <body>
-
+<canvas id="confetti"></canvas>
 <header>
   <div class="logo">Sanskriti's <span>streak</span> tracker</div>
   <div class="date-display" id="dateDisplay"></div>
 </header>
-
 <div class="main">
-
   <div class="streak-hero">
     <div>
-      <div class="streak-number mono" id="streakNum">0</div>
+      <div class="streak-number" id="streakNum">0</div>
       <div class="streak-label">day streak</div>
     </div>
     <div class="streak-right">
-      <div class="best-streak mono" id="bestStreak">0</div>
+      <div class="best-streak" id="bestStreak">0</div>
       <div class="best-label">best streak</div>
     </div>
   </div>
-
   <div class="stats-grid">
-    <div class="stat-card"><div class="stat-value v-green mono" id="totalDays">0</div><div class="stat-label">Total days logged</div></div>
-    <div class="stat-card"><div class="stat-value v-blue mono" id="thisWeek">0</div><div class="stat-label">This week</div></div>
-    <div class="stat-card"><div class="stat-value v-amber mono" id="totalHours">0h</div><div class="stat-label">Total hours</div></div>
-    <div class="stat-card"><div class="stat-value v-purple mono" id="tasksCompleted">0</div><div class="stat-label">Tasks done total</div></div>
+    <div class="stat-card"><div class="stat-value v-green" id="totalDays">0</div><div class="stat-label">Total days logged</div></div>
+    <div class="stat-card"><div class="stat-value v-blue" id="thisWeek">0</div><div class="stat-label">This week</div></div>
+    <div class="stat-card"><div class="stat-value v-amber" id="totalHours">0h</div><div class="stat-label">Total hours</div></div>
+    <div class="stat-card"><div class="stat-value v-purple" id="totalLeet">0</div><div class="stat-label">Problems solved</div></div>
   </div>
-
   <div class="two-col">
     <div class="card">
       <div class="card-title">Today's tasks</div>
       <div class="tasks-list" id="taskList"></div>
       <button class="checkin-btn" id="checkinBtn" onclick="checkIn()">Check in for today</button>
     </div>
-
     <div class="card">
-      <div class="card-title">Log focus hours</div>
-      <div class="hours-row"><span class="hours-label">DSA / Leetcode</span><input type="range" min="0" max="4" step="0.5" value="0" id="h-dsa" oninput="updateHours('dsa',this.value)"><span class="hours-val" id="v-dsa">0h</span></div>
-      <div class="hours-row"><span class="hours-label">Project work</span><input type="range" min="0" max="4" step="0.5" value="0" id="h-proj" oninput="updateHours('proj',this.value)"><span class="hours-val" id="v-proj">0h</span></div>
-      <div class="hours-row"><span class="hours-label">Applications</span><input type="range" min="0" max="2" step="0.5" value="0" id="h-apply" oninput="updateHours('apply',this.value)"><span class="hours-val" id="v-apply">0h</span></div>
-      <div class="hours-row"><span class="hours-label">Aptitude prep</span><input type="range" min="0" max="2" step="0.5" value="0" id="h-apt" oninput="updateHours('apt',this.value)"><span class="hours-val" id="v-apt">0h</span></div>
-      <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
-        <span style="font-size:13px;color:var(--muted);">Today's total</span>
-        <span style="font-family:'Space Mono',monospace;font-size:20px;color:var(--green);" id="todayTotal">0h</span>
+      <div class="card-title">Pomodoro timer</div>
+      <div class="pomodoro-display">
+        <div class="pom-time work" id="pomTime">25:00</div>
+        <div class="pom-label" id="pomLabel">Focus session</div>
+        <div class="pom-progress"><div class="pom-progress-fill" id="pomFill" style="width:100%"></div></div>
+        <div class="pom-sessions" id="pomSessions"></div>
+        <div class="pom-controls">
+          <button class="pom-btn" onclick="pomReset()">Reset</button>
+          <button class="pom-btn primary" id="pomBtn" onclick="pomToggle()">Start</button>
+          <button class="pom-btn" onclick="pomSkip()">Skip</button>
+        </div>
       </div>
     </div>
   </div>
-
   <div class="card">
-    <div class="card-title">Activity — last 16 weeks</div>
-    <div class="heatmap-row">
-      <div class="day-labels">
-        <div class="day-lbl">Mon</div>
-        <div class="day-lbl">Tue</div>
-        <div class="day-lbl">Wed</div>
-        <div class="day-lbl">Thu</div>
-        <div class="day-lbl">Fri</div>
-        <div class="day-lbl">Sat</div>
-        <div class="day-lbl">Sun</div>
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="switchTab('leet')">Leetcode log</button>
+      <button class="tab-btn" onclick="switchTab('journal')">Daily journal</button>
+      <button class="tab-btn" onclick="switchTab('heatmap')">Activity</button>
+      <button class="tab-btn" onclick="switchTab('weekly')">Weekly targets</button>
+    </div>
+    <div class="tab-panel active" id="tab-leet">
+      <div class="leet-stats">
+        <div class="leet-stat"><div class="leet-stat-num v-green" id="lsEasy">0</div><div class="leet-stat-lbl">Easy</div></div>
+        <div class="leet-stat"><div class="leet-stat-num v-amber" id="lsMedium">0</div><div class="leet-stat-lbl">Medium</div></div>
+        <div class="leet-stat"><div class="leet-stat-num" style="color:var(--red)" id="lsHard">0</div><div class="leet-stat-lbl">Hard</div></div>
+        <div class="leet-stat"><div class="leet-stat-num v-blue" id="lsTotal">0</div><div class="leet-stat-lbl">Total</div></div>
       </div>
-      <div class="heatmap-wrap">
-        <div class="heatmap-grid" id="heatmap"></div>
+      <div class="leet-add">
+        <input type="text" id="leetInput" placeholder="Problem name e.g. Two Sum" onkeydown="if(event.key==='Enter')addLeet()">
+        <select id="leetDiff"><option value="easy">Easy</option><option value="medium" selected>Medium</option><option value="hard">Hard</option></select>
+        <button class="leet-add-btn" onclick="addLeet()">+ Add</button>
+      </div>
+      <div class="leet-list" id="leetList"></div>
+    </div>
+    <div class="tab-panel" id="tab-journal">
+      <div class="journal-date-nav">
+        <button class="nav-btn" onclick="journalNav(-1)">&#8592;</button>
+        <span class="journal-date" id="journalDateLabel"></span>
+        <button class="nav-btn" onclick="journalNav(1)">&#8594;</button>
+      </div>
+      <textarea class="journal-textarea" id="journalText" placeholder="What did you work on today? Any blockers? Wins? Reflections..."></textarea>
+      <div style="display:flex;align-items:center;">
+        <button class="journal-save" onclick="saveJournal()">Save note</button>
+        <span class="journal-saved" id="journalSaved">Saved!</span>
+      </div>
+      <div class="journal-history" id="journalHistory"></div>
+    </div>
+    <div class="tab-panel" id="tab-heatmap">
+      <div class="card-title" style="margin-bottom:1rem;">Activity — last 16 weeks</div>
+      <div class="heatmap-row">
+        <div class="day-labels">
+          <div class="day-lbl">Mon</div><div class="day-lbl">Tue</div><div class="day-lbl">Wed</div>
+          <div class="day-lbl">Thu</div><div class="day-lbl">Fri</div><div class="day-lbl">Sat</div><div class="day-lbl">Sun</div>
+        </div>
+        <div class="heatmap-wrap"><div class="heatmap-grid" id="heatmap"></div></div>
+      </div>
+      <div class="legend">
+        <div class="leg-item"><div class="leg-box" style="background:var(--surface2)"></div>None</div>
+        <div class="leg-item"><div class="leg-box" style="background:rgba(0,232,122,0.25)"></div>1-2h</div>
+        <div class="leg-item"><div class="leg-box" style="background:rgba(0,232,122,0.5)"></div>2-3h</div>
+        <div class="leg-item"><div class="leg-box" style="background:rgba(0,232,122,0.75)"></div>3-4h</div>
+        <div class="leg-item"><div class="leg-box" style="background:var(--green)"></div>4h+</div>
       </div>
     </div>
-    <div class="legend">
-      <div class="leg-item"><div class="leg-box" style="background:var(--surface2)"></div>No activity</div>
-      <div class="leg-item"><div class="leg-box" style="background:rgba(0,232,122,0.25)"></div>1-2h</div>
-      <div class="leg-item"><div class="leg-box" style="background:rgba(0,232,122,0.5)"></div>2-3h</div>
-      <div class="leg-item"><div class="leg-box" style="background:rgba(0,232,122,0.75)"></div>3-4h</div>
-      <div class="leg-item"><div class="leg-box" style="background:var(--green)"></div>4h+</div>
+    <div class="tab-panel" id="tab-weekly">
+      <div class="card-title" style="margin-bottom:1rem;">Weekly targets</div>
+      <div class="weekly-targets" id="weeklyTargets"></div>
+      <div style="margin-top:1.5rem;border-top:1px solid var(--border);padding-top:1rem;">
+        <div class="card-title">Log today's hours</div>
+        <div class="hours-row"><span class="hours-label">DSA / Leetcode</span><input type="range" min="0" max="4" step="0.5" value="0" id="h-dsa" oninput="updateHours('dsa',this.value)"><span class="hours-val" id="v-dsa">0h</span></div>
+        <div class="hours-row"><span class="hours-label">Project work</span><input type="range" min="0" max="4" step="0.5" value="0" id="h-proj" oninput="updateHours('proj',this.value)"><span class="hours-val" id="v-proj">0h</span></div>
+        <div class="hours-row"><span class="hours-label">Applications</span><input type="range" min="0" max="2" step="0.5" value="0" id="h-apply" oninput="updateHours('apply',this.value)"><span class="hours-val" id="v-apply">0h</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">
+          <span style="font-size:13px;color:var(--muted);">Today's total</span>
+          <span style="font-family:'Space Mono',monospace;font-size:20px;color:var(--green);" id="todayTotal">0h</span>
+        </div>
+      </div>
     </div>
   </div>
-
-  <div class="card">
-    <div class="card-title">Weekly targets</div>
-    <div class="weekly-targets" id="weeklyTargets"></div>
-  </div>
-
 </div>
-
 <div class="toast" id="toast"></div>
-
 <script>
-const STORAGE_KEY = 'sanskriti_streak_v1';
-const TASKS = [
-  { id: 'dsa', text: 'Solve 1 Leetcode problem', tag: 'DSA', cls: 'tag-dsa' },
-  { id: 'commit', text: 'Make 1 GitHub commit', tag: 'Project', cls: 'tag-proj' },
-  { id: 'apply', text: 'Apply to 1 internship', tag: 'Apply', cls: 'tag-apply' },
-  { id: 'apt', text: 'Solve 10 aptitude questions', tag: 'Aptitude', cls: 'tag-apt' },
-  { id: 'learn', text: 'Watch 1 tech video', tag: 'Learn', cls: 'tag-learn' },
-];
-const WEEKLY = [
-  { label: 'Leetcode problems', key: 'leet', target: 5 },
-  { label: 'GitHub commits', key: 'commits', target: 3 },
-  { label: 'Applications sent', key: 'apps', target: 5 },
-  { label: 'Aptitude questions', key: 'apt', target: 50 },
-  { label: 'Focus hours', key: 'hours', target: 30 },
-];
-
-function todayKey() {
-  return new Date().toISOString().split('T')[0];
-}
-
-function loadData() {
-  try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || defaultData();
-  } catch(e) { return defaultData(); }
-}
-
-function defaultData() {
-  return {
-    days: {},
-    bestStreak: 0,
-    totalTasksDone: 0,
-    weeklyProgress: { leet: 0, commits: 0, apps: 0, apt: 0, hours: 0 },
-    weekStart: getWeekStart(),
-  };
-}
-
-function saveData(d) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(d));
-}
-
-function getWeekStart() {
-  const d = new Date();
-  const day = d.getDay();
-  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
-  const mon = new Date(d.setDate(diff));
-  return mon.toISOString().split('T')[0];
-}
-
-let data = loadData();
-let todayHours = { dsa: 0, proj: 0, apply: 0, apt: 0 };
-
-function getTodayData() {
-  const k = todayKey();
-  if (!data.days[k]) data.days[k] = { tasks: {}, hours: 0, checkedIn: false };
-  return data.days[k];
-}
-
-function calcStreak() {
-  let streak = 0;
-  const d = new Date();
-  for (let i = 0; i < 365; i++) {
-    const key = d.toISOString().split('T')[0];
-    if (data.days[key] && data.days[key].checkedIn) {
-      streak++;
-      d.setDate(d.getDate() - 1);
-    } else if (i === 0) {
-      d.setDate(d.getDate() - 1);
-    } else {
-      break;
-    }
-  }
-  return streak;
-}
-
-function calcThisWeek() {
-  const ws = getWeekStart();
-  let count = 0;
-  for (const k in data.days) {
-    if (k >= ws && data.days[k].checkedIn) count++;
-  }
-  return count;
-}
-
-function calcTotalHours() {
-  let total = 0;
-  for (const k in data.days) total += (data.days[k].hours || 0);
-  return Math.round(total * 10) / 10;
-}
-
-function updateHours(key, val) {
-  todayHours[key] = parseFloat(val);
-  document.getElementById('v-' + key).textContent = parseFloat(val) + 'h';
-  const total = Object.values(todayHours).reduce((a, b) => a + b, 0);
-  document.getElementById('todayTotal').textContent = (Math.round(total * 10) / 10) + 'h';
-}
-
-function toggleTask(id) {
-  const td = getTodayData();
-  td.tasks[id] = !td.tasks[id];
-  saveData(data);
-  renderTasks();
-  updateStats();
-}
-
-function checkIn() {
-  const td = getTodayData();
-  if (td.checkedIn) return;
-  const total = Object.values(todayHours).reduce((a, b) => a + b, 0);
-  td.hours = Math.round(total * 10) / 10;
-  td.checkedIn = true;
-
-  if (todayHours.dsa > 0) data.weeklyProgress.leet = Math.min(5, data.weeklyProgress.leet + 1);
-  if (todayHours.proj > 0) data.weeklyProgress.commits = Math.min(3, data.weeklyProgress.commits + 1);
-  if (todayHours.apply > 0) data.weeklyProgress.apps = Math.min(5, data.weeklyProgress.apps + 1);
-  if (todayHours.apt > 0) data.weeklyProgress.apt = Math.min(50, data.weeklyProgress.apt + 10);
-  data.weeklyProgress.hours = Math.min(30, Math.round((data.weeklyProgress.hours + total) * 10) / 10);
-
-  const streak = calcStreak();
-  if (streak > data.bestStreak) data.bestStreak = streak;
-
-  const doneTasks = Object.values(td.tasks).filter(Boolean).length;
-  data.totalTasksDone = (data.totalTasksDone || 0) + doneTasks;
-
-  saveData(data);
-  renderAll();
-  showToast('Checked in! Keep the streak going!');
-  document.getElementById('checkinBtn').disabled = true;
-  document.getElementById('checkinBtn').textContent = 'Checked in today';
-}
-
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2500);
-}
-
-function renderTasks() {
-  const td = getTodayData();
-  document.getElementById('taskList').innerHTML = TASKS.map(t => `
-    <div class="task-item" onclick="toggleTask('${t.id}')">
-      <div class="task-check ${td.tasks[t.id] ? 'done' : ''}"></div>
-      <span class="task-text ${td.tasks[t.id] ? 'done' : ''}">${t.text}</span>
-      <span class="task-tag ${t.cls}">${t.tag}</span>
-    </div>
-  `).join('');
-}
-
-function renderHeatmap() {
-  const grid = document.getElementById('heatmap');
-  const today = new Date();
-  const cells = [];
-  for (let i = 111; i >= 0; i--) {
-    const d = new Date(today);
-    d.setDate(today.getDate() - i);
-    const key = d.toISOString().split('T')[0];
-    const day = data.days[key];
-    const h = day ? (day.hours || 0) : 0;
-    const isToday = i === 0;
-    let lvl = '';
-    if (h >= 4) lvl = 'l4';
-    else if (h >= 3) lvl = 'l3';
-    else if (h >= 2) lvl = 'l2';
-    else if (h > 0 || (day && day.checkedIn)) lvl = 'l1';
-    cells.push(`<div class="hm-cell ${lvl} ${isToday ? 'today' : ''}" title="${key}: ${h}h"></div>`);
-  }
-  grid.innerHTML = cells.join('');
-}
-
-function renderWeekly() {
-  document.getElementById('weeklyTargets').innerHTML = WEEKLY.map(w => {
-    const val = data.weeklyProgress[w.key] || 0;
-    const pct = Math.min(100, Math.round((val / w.target) * 100));
-    return `<div class="wt-row">
-      <span class="wt-label">${w.label}</span>
-      <div class="wt-bar-bg"><div class="wt-bar-fill" style="width:${pct}%"></div></div>
-      <span class="wt-count">${val}/${w.target}</span>
-    </div>`;
-  }).join('');
-}
-
-function updateStats() {
-  const streak = calcStreak();
-  document.getElementById('streakNum').textContent = streak;
-  document.getElementById('bestStreak').textContent = Math.max(streak, data.bestStreak);
-  document.getElementById('totalDays').textContent = Object.values(data.days).filter(d => d.checkedIn).length;
-  document.getElementById('thisWeek').textContent = calcThisWeek();
-  document.getElementById('totalHours').textContent = calcTotalHours() + 'h';
-  document.getElementById('tasksCompleted').textContent = data.totalTasksDone || 0;
-}
-
-function renderAll() {
-  renderTasks();
-  renderHeatmap();
-  renderWeekly();
-  updateStats();
-  const td = getTodayData();
-  const btn = document.getElementById('checkinBtn');
-  if (td.checkedIn) { btn.disabled = true; btn.textContent = 'Checked in today'; }
-}
-
-document.getElementById('dateDisplay').textContent = new Date().toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-
-const ws = getWeekStart();
-if (data.weekStart !== ws) {
-  data.weeklyProgress = { leet: 0, commits: 0, apps: 0, apt: 0, hours: 0 };
-  data.weekStart = ws;
-  saveData(data);
-}
-
+const KEY='sanskriti_tracker_v2';
+const TASKS=[{id:'dsa',text:'Solve 1 Leetcode problem',tag:'DSA',cls:'tag-dsa'},{id:'commit',text:'Make 1 GitHub commit',tag:'Project',cls:'tag-proj'},{id:'apply',text:'Apply to 1 internship',tag:'Apply',cls:'tag-apply'},{id:'apt',text:'Solve 10 aptitude questions',tag:'Aptitude',cls:'tag-apt'},{id:'learn',text:'Watch 1 tech video',tag:'Learn',cls:'tag-learn'}];
+const WEEKLY=[{label:'Leetcode problems',key:'leet',target:5},{label:'GitHub commits',key:'commits',target:3},{label:'Applications sent',key:'apps',target:5},{label:'Focus hours',key:'hours',target:30}];
+const MILESTONES=[3,7,14,21,30,50,100];
+const todayKey=()=>new Date().toISOString().split('T')[0];
+const getWeekStart=()=>{const d=new Date(),day=d.getDay(),diff=d.getDate()-day+(day===0?-6:1);return new Date(new Date().setDate(diff)).toISOString().split('T')[0];};
+const loadData=()=>{try{return JSON.parse(localStorage.getItem(KEY))||defData();}catch(e){return defData();}};
+const defData=()=>({days:{},bestStreak:0,weeklyProgress:{leet:0,commits:0,apps:0,hours:0},weekStart:getWeekStart(),leetProblems:[],journals:{}});
+const saveData=()=>localStorage.setItem(KEY,JSON.stringify(data));
+let data=loadData(),todayHours={dsa:0,proj:0,apply:0},journalOffset=0;
+const getTD=()=>{const k=todayKey();if(!data.days[k])data.days[k]={tasks:{},hours:0,checkedIn:false};return data.days[k];};
+function calcStreak(){let s=0;const d=new Date();for(let i=0;i<365;i++){const k=d.toISOString().split('T')[0];if(data.days[k]&&data.days[k].checkedIn){s++;d.setDate(d.getDate()-1);}else if(i===0){d.setDate(d.getDate()-1);}else break;}return s;}
+function calcThisWeek(){const ws=getWeekStart();return Object.keys(data.days).filter(k=>k>=ws&&data.days[k].checkedIn).length;}
+function calcTotalHours(){return Math.round(Object.values(data.days).reduce((a,d)=>a+(d.hours||0),0)*10)/10;}
+function updateHours(k,v){todayHours[k]=parseFloat(v);document.getElementById('v-'+k).textContent=parseFloat(v)+'h';const t=Object.values(todayHours).reduce((a,b)=>a+b,0);document.getElementById('todayTotal').textContent=(Math.round(t*10)/10)+'h';}
+function toggleTask(id){const td=getTD();td.tasks[id]=!td.tasks[id];saveData();renderTasks();updateStats();}
+function checkIn(){const td=getTD();if(td.checkedIn)return;const t=Object.values(todayHours).reduce((a,b)=>a+b,0);td.hours=Math.round(t*10)/10;td.checkedIn=true;if(todayHours.dsa>0)data.weeklyProgress.leet=Math.min(5,data.weeklyProgress.leet+1);if(todayHours.proj>0)data.weeklyProgress.commits=Math.min(3,data.weeklyProgress.commits+1);if(todayHours.apply>0)data.weeklyProgress.apps=Math.min(5,data.weeklyProgress.apps+1);data.weeklyProgress.hours=Math.min(30,Math.round((data.weeklyProgress.hours+t)*10)/10);const streak=calcStreak();if(streak>data.bestStreak)data.bestStreak=streak;saveData();renderAll();const btn=document.getElementById('checkinBtn');btn.disabled=true;btn.textContent='Checked in today';const el=document.getElementById('streakNum');el.classList.add('pop');setTimeout(()=>el.classList.remove('pop'),500);if(MILESTONES.includes(streak)){launchConfetti();showToast('Amazing! '+streak+' day streak!');}else{showToast('Checked in! Keep going!');}}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+function switchTab(name){const names=['leet','journal','heatmap','weekly'];document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',names[i]===name));document.querySelectorAll('.tab-panel').forEach(p=>p.classList.toggle('active',p.id==='tab-'+name));if(name==='journal')renderJournal();}
+function renderTasks(){const td=getTD();document.getElementById('taskList').innerHTML=TASKS.map(t=>`<div class="task-item" onclick="toggleTask('${t.id}')"><div class="task-check ${td.tasks[t.id]?'done':''}"></div><span class="task-text ${td.tasks[t.id]?'done':''}">${t.text}</span><span class="task-tag ${t.cls}">${t.tag}</span></div>`).join('');}
+function renderHeatmap(){const grid=document.getElementById('heatmap'),today=new Date();grid.innerHTML=Array.from({length:112},(_,i)=>{const d=new Date(today);d.setDate(today.getDate()-(111-i));const key=d.toISOString().split('T')[0],day=data.days[key],h=day?(day.hours||0):0,isToday=111-i===0;let lvl=h>=4?'l4':h>=3?'l3':h>=2?'l2':(h>0||(day&&day.checkedIn))?'l1':'';return `<div class="hm-cell ${lvl} ${isToday?'today':''}" title="${key}: ${h}h"></div>`;}).join('');}
+function renderWeekly(){document.getElementById('weeklyTargets').innerHTML=WEEKLY.map(w=>{const val=data.weeklyProgress[w.key]||0,pct=Math.min(100,Math.round((val/w.target)*100));return `<div class="wt-row"><span class="wt-label">${w.label}</span><div class="wt-bar-bg"><div class="wt-bar-fill" style="width:${pct}%"></div></div><span class="wt-count">${val}/${w.target}</span></div>`;}).join('');}
+function addLeet(){const name=document.getElementById('leetInput').value.trim(),diff=document.getElementById('leetDiff').value;if(!name)return;if(!data.leetProblems)data.leetProblems=[];data.leetProblems.unshift({name,diff,date:todayKey(),id:Date.now()});document.getElementById('leetInput').value='';saveData();renderLeet();updateStats();showToast('Problem logged!');}
+function deleteLeet(id){data.leetProblems=data.leetProblems.filter(p=>p.id!==id);saveData();renderLeet();updateStats();}
+function renderLeet(){const p=data.leetProblems||[];document.getElementById('lsEasy').textContent=p.filter(x=>x.diff==='easy').length;document.getElementById('lsMedium').textContent=p.filter(x=>x.diff==='medium').length;document.getElementById('lsHard').textContent=p.filter(x=>x.diff==='hard').length;document.getElementById('lsTotal').textContent=p.length;document.getElementById('leetList').innerHTML=p.length?p.map((x,i)=>`<div class="leet-item"><span class="leet-num">#${p.length-i}</span><span class="leet-name">${x.name}</span><span class="diff-${x.diff}">${x.diff}</span><span class="leet-date">${x.date}</span><button class="leet-del" onclick="deleteLeet(${x.id})">x</button></div>`).join(''):'<div class="empty-state">No problems logged yet. Add your first one!</div>';}
+const getJournalDate=()=>{const d=new Date();d.setDate(d.getDate()+journalOffset);return d.toISOString().split('T')[0];};
+function journalNav(dir){journalOffset+=dir;if(journalOffset>0)journalOffset=0;renderJournal();}
+function renderJournal(){const key=getJournalDate(),d=new Date(key);document.getElementById('journalDateLabel').textContent=d.toLocaleDateString('en-IN',{weekday:'long',month:'long',day:'numeric'});document.getElementById('journalText').value=(data.journals||{})[key]||'';const entries=Object.entries(data.journals||{}).filter(([k])=>k!==key).sort((a,b)=>b[0].localeCompare(a[0])).slice(0,5);document.getElementById('journalHistory').innerHTML=entries.length?entries.map(([k,v])=>`<div class="journal-entry-preview" onclick="jumpToJournal('${k}')"><div class="je-date">${k}</div><div class="je-text">${v}</div></div>`).join(''):'';}
+function jumpToJournal(key){const today=new Date().toISOString().split('T')[0],d1=new Date(key),d2=new Date(today);journalOffset=Math.round((d1-d2)/(1000*60*60*24));renderJournal();}
+function saveJournal(){const key=getJournalDate();if(!data.journals)data.journals={};data.journals[key]=document.getElementById('journalText').value;saveData();const s=document.getElementById('journalSaved');s.style.opacity='1';setTimeout(()=>s.style.opacity='0',1500);renderJournal();}
+let pomInt=null,pomOn=false,pomWork=true,pomLeft=25*60,pomTotal=25*60,pomDone=0;
+const PW=25*60,PR=5*60;
+function pomToggle(){if(pomOn){clearInterval(pomInt);pomOn=false;document.getElementById('pomBtn').textContent='Resume';}else{pomOn=true;document.getElementById('pomBtn').textContent='Pause';pomInt=setInterval(()=>{pomLeft--;if(pomLeft<=0){clearInterval(pomInt);pomOn=false;if(pomWork){pomDone++;pomWork=false;pomLeft=PR;pomTotal=PR;showToast('Break time! 5 minutes.');}else{pomWork=true;pomLeft=PW;pomTotal=PW;showToast('Back to focus!');}document.getElementById('pomBtn').textContent='Start';}renderPom();},1000);}}
+function pomReset(){clearInterval(pomInt);pomOn=false;pomWork=true;pomLeft=PW;pomTotal=PW;document.getElementById('pomBtn').textContent='Start';renderPom();}
+function pomSkip(){clearInterval(pomInt);pomOn=false;if(pomWork){pomDone++;pomWork=false;pomLeft=PR;pomTotal=PR;}else{pomWork=true;pomLeft=PW;pomTotal=PW;}document.getElementById('pomBtn').textContent='Start';renderPom();}
+function renderPom(){const m=Math.floor(pomLeft/60).toString().padStart(2,'0'),s=(pomLeft%60).toString().padStart(2,'0');document.getElementById('pomTime').textContent=m+':'+s;document.getElementById('pomTime').className='pom-time '+(pomWork?'work':'rest');document.getElementById('pomLabel').textContent=pomWork?'Focus session':'Break time';document.getElementById('pomFill').style.width=Math.round((pomLeft/pomTotal)*100)+'%';document.getElementById('pomSessions').innerHTML=Array.from({length:4},(_,i)=>`<div class="pom-dot ${i<pomDone?'done':''}"></div>`).join('');}
+function updateStats(){const streak=calcStreak();document.getElementById('streakNum').textContent=streak;document.getElementById('bestStreak').textContent=Math.max(streak,data.bestStreak||0);document.getElementById('totalDays').textContent=Object.values(data.days).filter(d=>d.checkedIn).length;document.getElementById('thisWeek').textContent=calcThisWeek();document.getElementById('totalHours').textContent=calcTotalHours()+'h';document.getElementById('totalLeet').textContent=(data.leetProblems||[]).length;}
+function launchConfetti(){const c=document.getElementById('confetti'),ctx=c.getContext('2d');c.width=window.innerWidth;c.height=window.innerHeight;const p=Array.from({length:120},()=>({x:Math.random()*c.width,y:-10,vx:(Math.random()-0.5)*6,vy:Math.random()*4+2,color:['#00e87a','#4f9eff','#ffb830','#9f7eff','#ff5c5c'][Math.floor(Math.random()*5)],size:Math.random()*8+4,angle:Math.random()*360,spin:(Math.random()-0.5)*10}));let f=0;function draw(){ctx.clearRect(0,0,c.width,c.height);p.forEach(x=>{x.x+=x.vx;x.y+=x.vy;x.angle+=x.spin;x.vy+=0.1;ctx.save();ctx.translate(x.x,x.y);ctx.rotate(x.angle*Math.PI/180);ctx.fillStyle=x.color;ctx.fillRect(-x.size/2,-x.size/2,x.size,x.size);ctx.restore();});f++;if(f<120)requestAnimationFrame(draw);else ctx.clearRect(0,0,c.width,c.height);}draw();}
+function renderAll(){renderTasks();renderHeatmap();renderWeekly();renderLeet();updateStats();renderPom();const td=getTD();if(td.checkedIn){const b=document.getElementById('checkinBtn');b.disabled=true;b.textContent='Checked in today';}}
+document.getElementById('dateDisplay').textContent=new Date().toLocaleDateString('en-IN',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+const ws=getWeekStart();if(data.weekStart!==ws){data.weeklyProgress={leet:0,commits:0,apps:0,hours:0};data.weekStart=ws;saveData();}
 renderAll();
 </script>
 </body>
